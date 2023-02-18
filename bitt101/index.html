@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script src='../lib/jquery/jquery-3.6.3.js'></script>
+</head>
+
+<body style='margin: 0px; font-family: monospace; line-height: 23px;'>
+
+<div style='width: 100%; padding: 10px;'>
+    [TEASER]<br>
+    bitt101 editor will be here. webserial availability confirmation. (after open, try 'ls')<br>
+    <br>
+    <button id='btn_open'>Open/Read</button>&nbsp;<button id='btn_close'>Close</button>
+    <input type='text' id='txt_send' value=''></input> <button id='btn_send'>Send</button><br>
+    <br>
+    <!--<button id='btn_get_keymap'>get(download) keymap</button>-->
+</div>
+
+<div style='border-top-width: 1px;'>
+<textarea style='margin: 0px; background-color: #d6d6d677; color: #6b6b6b; width: 100%; height: 280px; border: 0px solid; padding: 5px; font-size: 11px; font-family: Roboto Mono, monospace;' id='log_serial'></textarea><br>
+</div>
+
+<div style='' id='container_keymap'>
+    <div style='background-image: "./image/topview.png"; width: 100%; zoom: 1.0;'>
+
+    </div>
+
+</div>
+
+<br>
+
+</body>
+
+
+<script> // html elements
+let log_serial = $('#log_serial');
+let btn_open   = $('#btn_open');
+let btn_close  = $('#btn_close');
+let btn_send   = $('#btn_send');
+let txt_send   = $('#txt_send');
+
+let btn_get_keymap  = $('#btn_get_keymap');
+let btn_upload_temp = 0;
+
+btn_open.on('click', async() => {
+    if(navigator.serial) {
+        serial_read(port);
+    } else {
+        alert('web serial doesn not work on this browser.');
+    }
+});
+
+btn_send.on('click', async() => {
+    console.log('sending ', txt_send.val());
+    serial_write(txt_send.val());
+    txt_send.val('');
+});
+
+btn_close.on('click', async() => {
+    //
+});
+
+btn_get_keymap.on('click', async() => {
+    console.log('start downloading keymap');
+});
+
+function append_seriallog(msg) {
+    log_serial.html(log_serial.html() + msg.replace('/> ', ''));
+    log_serial.scrollTop(log_serial[0].scrollHeight - log_serial.height());// = log_serial.innerHeight();
+}
+</script>
+
+
+<script> // serial communication
+let port;
+
+const filters = [
+    { usbVendorId: 0x5A64, usbProductId: 0x8009 },
+    { usbVendorId: 0x5A64, usbProductId: 0x8008 }
+];
+
+
+async function serial_read() {
+    try {
+        port = await navigator.serial.requestPort({filters});
+        await port.open({baudRate: 115200});
+        // TODO: disable open button when opened.
+
+        while(port.readable) {
+            const reader = port.readable.getReader();
+            try {
+                while(true) {
+                    const {value, done} = await reader.read();
+                    if(done) {
+                        append_seriallog('Cancelled\n');
+                        break;
+                    }
+                    const input_value = new TextDecoder().decode(value);
+                    append_seriallog(input_value);
+                }
+            } catch (e) { 
+                append_seriallog("[ERR:read] " + e + "\n");
+            } finally {
+                reader.releaseLock();
+                // TODO: enable open button when closed.
+            }
+        }
+    } catch (e) {
+        append_seriallog("[ERR:open] " + e + "\n");
+    }
+}
+
+async function serial_write(msg) {
+    const encoder = new TextEncoder();
+    const writer = port.writable.getWriter();
+    await writer.write(encoder.encode("\n\r" + msg + "\n\r"));
+    writer.releaseLock();
+
+    txt_send.val('');
+}
+
+
+
+
+/*
+
+const port = {};
+var is_keepreading = true;
+var serial_reader;
+const log_serial = $('#log_serial');
+const btn_open   = $('#btn_open');
+const btn_close  = $('#btn_close');
+
+async function serial_start_read_until_closed(p) {
+    while(p.readable && is_keepreading) {
+        reader = port.readable.getReader();
+        //try
+        while(true) {
+            const {value, done} = await reader.read();
+            if(done) break;
+            if(value) log_serial.html( log_serial.html() + value + '\n');
+        }
+        //catch(error)
+        //finally
+    }
+    await p.close();
+}
+
+const promise_serial_closed = serial_start_read_until_closed();
+
+async function serial_connect() {
+    const log = $('#log_serial');
+    const port = await navigator.serial.requestPort({filters});
+    await port.open({baudRate: 115200});
+
+    const decoder = new TextDecoderStream();
+    port.readable.pipeTo(decoder.writable);
+
+    const inputStream = decoder.readable;
+    const reader = inputStream.getReader();
+
+    // do try-catch
+    while(true) {
+        const {value, done} = await reader.read();
+        if(value) {
+            log.html( log.html() + value + '\n');
+        }
+        if(done) {
+            console.log('[READ] done - ', done);
+            reader.releaseLock();
+            break;
+        }
+    }
+}
+
+*/
+
+
+</script>
+
