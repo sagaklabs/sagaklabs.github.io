@@ -1,0 +1,47 @@
+.easySelectable {-webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;}
+#leds_face {
+    display: grid;
+    grid-template-columns: repeat(16, 18px);
+    grid-template-rows: 30px 30px;
+    row-gap: 12px;
+    column-gap: 24.61px;
+    padding-top: 27px;
+    padding-left: 128px;
+}
+#leds_face li {
+    background: #7772;
+    transition: all 0.15s ease;
+    letter-spacing: -0.03em;
+    width: 31px;
+    height: 30px;
+    border-radius: 2.5px;
+    outline: 1px solid #000;
+    color: #111;
+    /*font-weight: bold;
+    margin: 0 10.5px 10px 0;
+    justify-content: center;
+    align-items: center;
+    text-align: center;*/
+    display: flex;
+    cursor: pointer;
+}
+#leds_face li .pad {
+    font-size: 9px;
+    line-height: 12px;
+    padding-left: 1px;
+    padding-top: 0px;
+    background-color: #F5F5F51F;
+    width: 100%;
+    margin: 1.5px 4px 3px 2px;
+    /*
+    border-radius: 3px;
+    box-shadow: #00000096 0.5px -0.5px 0px 0px inset, #ffffff96 0px 0px 0px 1px inset;
+    */
+}
+#leds_face li.es-selected {
+    background: #858585;
+    color: #000000;
+    font-weight: bold;
+    outline: 6px solid #222E;
+    box-shadow: 0px 0px 0px 2px #FFF7 inset;
+}

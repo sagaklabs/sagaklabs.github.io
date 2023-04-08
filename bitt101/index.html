@@ -1,203 +1,1054 @@
-
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8" />
+
     <script src='../lib/jquery/jquery-3.6.3.js'></script>
+    <script src='../lib/easyselect/easySelectable.js'></script>
+    <script src='../lib/spectrum/spectrum.js'></script>
+    <script src='../lib/tinycolor/tinycolor.js'></script> <!-- TODO: check version for tinycolor - spectrum.tinycolor -->
+    <script src='../lib/bitt101/bitt101.js'></script>
+
+    <link rel='stylesheet' href='../lib/bitt101/bitt101.css'></link>
+    <link rel='stylesheet' href='../lib/easyselect/easySelectable.css'></link>
+    <link rel='stylesheet' href='../lib/spectrum/spectrum.css'></link>
+
+    <style>
+        body {
+            color: white;
+            background-color: #999;
+            margin: 0 auto;
+            max-width: max-content;
+            font-family: "Roboto Mono Light", monospace;
+            font-size: 15px;
+            line-height: 25px;
+            overflow-y: scroll;
+        }
+
+        textarea::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+
 </head>
 
-<body style='margin: 0px; font-family: "Roboto Mono Light", monospace; font-size: 15px; line-height: 25px;'>
+<body>
 
-<div style='width: 100%; padding: 10px;'>
-    <b>[TEASER (v0.004)]</b> - bitt101 editor will be here.<br>
-    <br>
-    1. this page is to test the bitt101's serial connection.<br>
-    2. <a href='https://github.com/sagaklabs/sagaklabs.github.io'>source code</a> is here.<br>
-    3. usage<br>
-    > press [open]<br>
-    > put 'help' in input field and press [send]<br>
-    > you can also try ls, cd, ...<br>
-    > do not delete system files.<br>
-    > if you deleted something, run 'rm version-x.xx.xxx'<br>
-    .  and 'reboot' the keyboard. bitt101 will factory reset<br>
-    .  if it cannot find version file from /<br>
-    > refresh page to disconnect<br>
-    <br>
+<div style='width: 100%; padding: 10px; height: 70px; display: flex;'>
+    <div style='min-width: 210px;'>
+        <div style='font-family: "Roboto Mono Light", monospace; font-size: 24px; color: #FFF; line-height: 80px; height:80px; letter-spacing: -0.03em; padding-left: 5px;'>
+            <span>bitt101 editor(alpha/<a href='https://cdn.shopify.com/s/files/1/0623/4990/2000/files/bitt101-1.72.541.uf2?v=1680969780'>firmware</a>)</span>
+        </div>
+        <div style='display: none;'>
+        <input type='button' id='btn_serial' value='PRESS TO CONNECT'
+            style='line-height: 20px;
+            width: 200px;
+            height: 40px;
+            font-family: "Roboto Mono Regular", monospace;
+            font-size: 15px;
+            border-radius: 4px;
+            transition: background 0.8s;
+        '>
+        </input><br>
+        </div>
+        <!--<div style='font-size: 14px;'>[MESSAGE] message from UI comes here.</div>-->
+    </div>
+    <div id='loaded_container' style='min-width: 390px; width: 200px; display: flex; opacity: 0.3; transition: opacity 0.8s; display: none;'>
+        <div style='min-width: 100px; padding-left: 20px;'>
+            LEDCOLOR<br>
+            <select id='select_loaded_ledpalette' style='
+                width: 150px;
+                height: 40px;
+                border: 2px solid #000;
+                margin: 0px 0px -5px 0px;
+                font-size: 14px;
+                font-family: "Roboto Mono Regular", monospace;'
+            >
+                <option>updown</option>
+                <option>downup</option>
+                <option>custom 1</option>
+            </select>
+        </div>
+        <div style='min-width: 100px; margin-left: 20px; display: none;'>
+            KEYMAP<br>
+            <select id='select_loaded_keymap' style='
+                width: 170px;
+                height: 40px;
+                border: 2px solid #000;
+                margin: 0px 0px -5px 0px;
+                font-size: 14px;
+                font-family: "Roboto Mono Regular", monospace;'
+            >
+                <option>windows</option>
+                <option>mac</option>
+                <option>custom 1</option>
+            </select>
+        </div>
+    </div>
+    <div style='margin: auto; margin-right: 20px;'>
+        <div id='toggle_serial' class='toggleserial_container'>
+            <div class='toggleserial_head'>bitt101.UART</div>
+            <div class='toggleserial_toggle'></div>
+        </div>
+    </div>
+    <div style='min-width: 200px; padding-right: 20px;'>
+        <textarea class='terminal_screen' id='log_serial'></textarea></br>
+            <input class='terminal_input' id='input_serial'><br>
+            <span class='terminal_prompt'>/> </span></br>
+        </div>
+    </div>
+
+    <!--
     <button id='btn_open'>Open</button>&nbsp;<button id='btn_close'>Close</button>
     <input type='text' id='txt_send' value=''></input> <button id='btn_send'>Send</button><br>
     <br>
+    <input type='file' id='file-config-json'>
+    -->
+
     <!--<button id='btn_get_keymap'>get(download) keymap</button>-->
 </div>
 
-<div style='border-top-width: 1px;'>
-<textarea style='
-    margin: 0px;
-    background-color: #000000;
-    color: #45ff3f;
-    width: 100%;
-    height: 420px;
-    border: 0px solid;
-    padding: 5px;
-    font-size: 10px;
-    line-height: 1.5em;
-    font-family: "Roboto Mono", "Courier New", monospace;' id='log_serial'></textarea><br>
-</div>
 
-<!--
-<div style='padding: 5px; align-content: center;'>
-    <div style='background-image: url("../image/topview.png"); width: 1022px; height: 225px; zoom: 1.0; image-rendering: -webkit-optimize-contrast;'>
+<!-- keyboard map -->
+<div id='keyboard_container' style='margin: 10px; align-content: center; background-image: url("../image/topview.png"); width: 1022px; height: 455px; border: 1px solid #000; zoom: 1.0; image-rendering: -webkit-optimize-contrast; box-shadow: 3px 6px 1px #0002;'>
+    <div id='keyboard_top' style='display: flex;'>
+        <!-- led map -->
+        <div id='leds_container' style='width: 830px; height: 130px;'>
+            <ul id='leds_face'>
+            <li id='1' ><div class='pad'>1 <br><span class='leds_kc' id='p5_0'  row='5' col='0'  no='1'  layers=''></span></div></li>
+            <li id='2' ><div class='pad'>2 <br><span class='leds_kc' id='p5_1'  row='5' col='1'  no='2'  layers=''></span></div></li>
+            <li id='3' ><div class='pad'>3 <br><span class='leds_kc' id='p5_2'  row='5' col='2'  no='3'  layers=''></span></div></li>
+            <li id='4' ><div class='pad'>4 <br><span class='leds_kc' id='p5_3'  row='5' col='3'  no='4'  layers=''></span></div></li>
+            <li id='5' ><div class='pad'>5 <br><span class='leds_kc' id='p5_4'  row='5' col='4'  no='5'  layers=''></span></div></li>
+            <li id='6' ><div class='pad'>6 <br><span class='leds_kc' id='p5_5'  row='5' col='5'  no='6'  layers=''></span></div></li>
+            <li id='7' ><div class='pad'>7 <br><span class='leds_kc' id='p5_6'  row='5' col='6'  no='7'  layers=''></span></div></li>
+            <li id='8' ><div class='pad'>8 <br><span class='leds_kc' id='p5_7'  row='5' col='7'  no='8'  layers=''></span></div></li>
+            <li id='9' ><div class='pad'>9 <br><span class='leds_kc' id='p5_8'  row='5' col='8'  no='9'  layers=''></span></div></li>
+            <li id='10'><div class='pad'>10<br><span class='leds_kc' id='p5_9'  row='5' col='9'  no='10' layers=''></span></div></li>
+            <li id='11'><div class='pad'>11<br><span class='leds_kc' id='p5_10' row='5' col='10' no='11' layers=''></span></div></li>
+            <li id='12'><div class='pad'>12<br><span class='leds_kc' id='p5_11' row='5' col='11' no='12' layers=''></span></div></li>
+            <li id='13'><div class='pad'>13<br><span class='leds_kc' id='p5_12' row='5' col='12' no='13' layers=''></span></div></li>
+            <li id='14'><div class='pad'>14<br><span class='leds_kc' id='p5_13' row='5' col='13' no='14' layers=''></span></div></li>
+            <li id='15'><div class='pad'>15<br><span class='leds_kc' id='p5_14' row='5' col='14' no='15' layers=''></span></div></li>
+            <li id='16'><div class='pad'>16<br><span class='leds_kc' id='p5_15' row='5' col='15' no='16' layers=''></span></div></li>
+            <li id='17'><div class='pad'>17<br><span class='leds_kc' id='p6_0'  row='6' col='0'  no='17' layers=''></span></div></li>
+            <li id='18'><div class='pad'>18<br><span class='leds_kc' id='p6_1'  row='6' col='1'  no='18' layers=''></span></div></li>
+            <li id='19'><div class='pad'>19<br><span class='leds_kc' id='p6_2'  row='6' col='2'  no='19' layers=''></span></div></li>
+            <li id='20'><div class='pad'>20<br><span class='leds_kc' id='p6_3'  row='6' col='3'  no='20' layers=''></span></div></li>
+            <li id='21'><div class='pad'>21<br><span class='leds_kc' id='p6_4'  row='6' col='4'  no='21' layers=''></span></div></li>
+            <li id='22'><div class='pad'>22<br><span class='leds_kc' id='p6_5'  row='6' col='5'  no='22' layers=''></span></div></li>
+            <li id='23'><div class='pad'>23<br><span class='leds_kc' id='p6_6'  row='6' col='6'  no='23' layers=''></span></div></li>
+            <li id='24'><div class='pad'>24<br><span class='leds_kc' id='p6_7'  row='6' col='7'  no='24' layers=''></span></div></li>
+            <li id='25'><div class='pad'>25<br><span class='leds_kc' id='p6_8'  row='6' col='8'  no='25' layers=''></span></div></li>
+            <li id='26'><div class='pad'>26<br><span class='leds_kc' id='p6_9'  row='6' col='9'  no='26' layers=''></span></div></li>
+            <li id='27'><div class='pad'>27<br><span class='leds_kc' id='p6_10' row='6' col='10' no='27' layers=''></span></div></li>
+            <li id='28'><div class='pad'>28<br><span class='leds_kc' id='p6_11' row='6' col='11' no='28' layers=''></span></div></li>
+            <li id='29'><div class='pad'>29<br><span class='leds_kc' id='p6_12' row='6' col='12' no='29' layers=''></span></div></li>
+            <li id='30'><div class='pad'>30<br><span class='leds_kc' id='p6_13' row='6' col='13' no='30' layers=''></span></div></li>
+            <li id='31'><div class='pad'>31<br><span class='leds_kc' id='p6_14' row='6' col='14' no='31' layers=''></span></div></li>
+            <li id='32'><div class='pad'>32<br><span class='leds_kc' id='p6_15' row='6' col='15' no='32' layers=''></span></div></li>
+            </ul>
+        </div>
+
+        <div id='oled_container'>
+            <textarea id='oled_242' readonly style='
+                background-color: #000000f0;
+                color: #CCCC;
+                width: 151px;
+                height: 73px;
+                margin-top: 39px;
+                margin-left: 0px;
+                border-radius: 3px;
+                resize: none;
+                overflow: auto;
+                font-size: 8px;
+                font-family: "Roboto Mono Light", "Courier New", monospace;
+                text-shadow: 0 0 3px #FFF;
+            '></textarea>
+        </div>
+
+    </div>
+
+    <div id='keyboard_bottom' style='width: 1022px; height: 455px;'>
+        <div id='keyboard_face' style='display: flex; position: relative; left: 41px; top: 18.5px;'>
+        </div>
+    </div>
+
     </div>
 </div>
--->
 
-<br>
+
+<div style='border-top-width: 1px; display: flex; margin-left: 10px; margin-top: 25px;'>
+    <!-- bottom L -->
+    <div id='keydesc' class='keydesc_container' style=''>
+        <div id='col_name'  style='margin-left: 0px; grid-row: span 2; display: flex;'>
+            <textarea class='keydesc_selected' id='keydesc_selected' readonly style='height: 0px;'></textarea>
+        </div>
+        <div id='col_map'   style='margin-left: 10px; column-gap: 10px; display: none;'></div>
+        <div id='col_color' style='margin-left: 10px; display: none;'><input type='text' id='keydesc_colorpicker' class='keydesc_colorpicker basic' value=''></div>
+    </div>
+    <div id='col_apply' style='margin-left: 10px;'>
+        <div id='button_apply_keymap'   class='button_apply' style='opacity: 0;'>SAVE KEYMAP</div>
+        <div id='button_apply_ledcolor' class='button_apply' style='opacity: 0; margin-top: -3px;'>SAVE LEDCOLORS</div>
+    </div>
+</div>
+
+
+<div id='keycodes_popup' class='keycodes_popup_container' style='display: none;'>
+    <div id='keycodes_popup_outer' class='keycodes_popup_outer'></div>
+    <div class='keycodes_popup_inner_container'>
+    <!-- KC grid listing -->
+    <div id='keycodes_normal' class='keycodes_container normal'>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_GRV'  hk='HID_KEY_GRAVE'             class='keycodes_legend'>`</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_1'    hk='HID_KEY_1'                 class='keycodes_legend'>1</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_2'    hk='HID_KEY_2'                 class='keycodes_legend'>2</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_3'    hk='HID_KEY_3'                 class='keycodes_legend'>3</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_4'    hk='HID_KEY_4'                 class='keycodes_legend'>4</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_5'    hk='HID_KEY_5'                 class='keycodes_legend'>5</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_6'    hk='HID_KEY_6'                 class='keycodes_legend'>6</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_7'    hk='HID_KEY_7'                 class='keycodes_legend'>7</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_8'    hk='HID_KEY_8'                 class='keycodes_legend'>8</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_9'    hk='HID_KEY_9'                 class='keycodes_legend'>9</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_0'    hk='HID_KEY_0'                 class='keycodes_legend'>0</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_MINS' hk='HID_KEY_MINUS'             class='keycodes_legend'>-</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_EQL'  hk='HID_KEY_EQUAL'             class='keycodes_legend'>=</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_BSPC' hk='HID_KEY_BACKSPACE'         class='keycodes_legend'>BKSP</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_TAB'  hk='HID_KEY_TAB'               class='keycodes_legend'>TAB</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_Q'    hk='HID_KEY_Q'                 class='keycodes_legend'>Q</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_W'    hk='HID_KEY_W'                 class='keycodes_legend'>W</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_E'    hk='HID_KEY_E'                 class='keycodes_legend'>E</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_R'    hk='HID_KEY_R'                 class='keycodes_legend'>R</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_T'    hk='HID_KEY_T'                 class='keycodes_legend'>T</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_Y'    hk='HID_KEY_Y'                 class='keycodes_legend'>Y</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_U'    hk='HID_KEY_U'                 class='keycodes_legend'>U</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_I'    hk='HID_KEY_I'                 class='keycodes_legend'>I</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_O'    hk='HID_KEY_O'                 class='keycodes_legend'>O</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P'    hk='HID_KEY_P'                 class='keycodes_legend'>P</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_LBRC' hk='HID_KEY_BRACKET_LEFT'      class='keycodes_legend'>[</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_RBRC' hk='HID_KEY_BRACKET_RIGHT'     class='keycodes_legend'>]</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_BSLS' hk='HID_KEY_BACKSLASH'         class='keycodes_legend'>\</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_CAPS' hk='HID_KEY_CAPS_LOCK'         class='keycodes_legend'>CAPS</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_A'    hk='HID_KEY_A'                 class='keycodes_legend'>A</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_S'    hk='HID_KEY_S'                 class='keycodes_legend'>S</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_D'    hk='HID_KEY_D'                 class='keycodes_legend'>D</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F'    hk='HID_KEY_F'                 class='keycodes_legend'>F</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_G'    hk='HID_KEY_G'                 class='keycodes_legend'>G</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_H'    hk='HID_KEY_H'                 class='keycodes_legend'>H</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_J'    hk='HID_KEY_J'                 class='keycodes_legend'>J</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_K'    hk='HID_KEY_K'                 class='keycodes_legend'>K</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_L'    hk='HID_KEY_L'                 class='keycodes_legend'>L</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_SCLN' hk='HID_KEY_SEMICOLON'         class='keycodes_legend'>;</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_QUOT' hk='HID_KEY_APOSTROPHE'        class='keycodes_legend'>'</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_ENT'  hk='HID_KEY_ENTER'             class='keycodes_legend'>ENT</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LSFT' hk='HID_KEY_SHIFT_LEFT'        class='keycodes_legend'>LSFT</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_Z'    hk='HID_KEY_Z'                 class='keycodes_legend'>Z</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_X'    hk='HID_KEY_X'                 class='keycodes_legend'>X</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_C'    hk='HID_KEY_C'                 class='keycodes_legend'>C</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_V'    hk='HID_KEY_V'                 class='keycodes_legend'>V</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_B'    hk='HID_KEY_B'                 class='keycodes_legend'>B</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_N'    hk='HID_KEY_N'                 class='keycodes_legend'>N</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_M'    hk='HID_KEY_M'                 class='keycodes_legend'>M</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_COMM' hk='HID_KEY_COMMA'             class='keycodes_legend'>,</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_DOT'  hk='HID_KEY_PERIOD'            class='keycodes_legend'>.</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_SLSH' hk='HID_KEY_SLASH'             class='keycodes_legend'>/</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RSFT' hk='HID_KEY_SHIFT_RIGHT'       class='keycodes_legend'>RSFT</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_UP'   hk='HID_KEY_UP'                class='keycodes_legend'>↑</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LCTL' hk='HID_KEY_CONTROL_LEFT'      class='keycodes_legend'>LCTL</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LWIN' hk='HID_KEY_GUI_LEFT'          class='keycodes_legend'>LWIN</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LALT' hk='HID_KEY_ALT_LEFT'          class='keycodes_legend'>LALT</div></div></div>
+        <div class='keycodes_item col7'><div class='keycodes_inner'><div kc='KC_SPC'  hk='HID_KEY_SPACE'             class='keycodes_legend'>SPC</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RALT' hk='HID_KEY_ALT_RIGHT'         class='keycodes_legend'>RALT</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_MENU' hk='HID_KEY_MENU'              class='keycodes_legend'>MENU</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RCTL' hk='HID_KEY_CONTROL_RIGHT'     class='keycodes_legend'>RCTL</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RWIN' hk='HID_KEY_GUI_RIGHT'         class='keycodes_legend'>RWIN</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_INS'  hk='HID_KEY_INSERT'            class='keycodes_legend packed'>INS</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_DEL'  hk='HID_KEY_DELETE'            class='keycodes_legend packed'>DEL</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_HOME' hk='HID_KEY_HOME'              class='keycodes_legend packed'>HO<br>ME</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_END'  hk='HID_KEY_END'               class='keycodes_legend packed'>END</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PGUP' hk='HID_KEY_PAGE_UP'           class='keycodes_legend packed'>PG<br>UP</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PGDN' hk='HID_KEY_PAGE_DOWN'         class='keycodes_legend packed'>PG<br>DN</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_LEFT' hk='HID_KEY_LEFT'              class='keycodes_legend'>←</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_DOWN' hk='HID_KEY_DOWN'              class='keycodes_legend'>↓</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_RGHT' hk='HID_KEY_RGHT'              class='keycodes_legend'>→</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_ESC'  hk='HID_KEY_ESCAPE'            class='keycodes_legend packed'>ESC</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LOPT' hk='HID_KEY_ALT_LEFT'          class='keycodes_legend'>LOPT</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_ROPT' hk='HID_KEY_ALT_RIGHT'         class='keycodes_legend'>ROPT</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LGUI' hk='HID_KEY_LGUI'              class='keycodes_legend'>LGUI</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RGUI' hk='HID_KEY_RGUI'              class='keycodes_legend'>RGUI</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_LCMD' hk='HID_KEY_GUI_LEFT'          class='keycodes_legend'>LCMD</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RCMD' hk='HID_KEY_GUI_RIGHT'         class='keycodes_legend'>RCMD</div></div></div>
+        <div class='keycodes_item col2'><div class='keycodes_inner'><div kc='KC_RLGR' hk='HID_KEY_ALT_RIGHT'         class='keycodes_legend'>RLGR</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F1'   hk='HID_KEY_F1'                class='keycodes_legend packed'>F1</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F2'   hk='HID_KEY_F2'                class='keycodes_legend packed'>F2</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F3'   hk='HID_KEY_F3'                class='keycodes_legend packed'>F3</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F4'   hk='HID_KEY_F4'                class='keycodes_legend packed'>F4</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F5'   hk='HID_KEY_F5'                class='keycodes_legend packed'>F5</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F6'   hk='HID_KEY_F6'                class='keycodes_legend packed'>F6</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F7'   hk='HID_KEY_F7'                class='keycodes_legend packed'>F7</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F8'   hk='HID_KEY_F8'                class='keycodes_legend packed'>F8</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F9'   hk='HID_KEY_F9'                class='keycodes_legend packed'>F9</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F10'  hk='HID_KEY_F10'               class='keycodes_legend packed'>F10</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F11'  hk='HID_KEY_F11'               class='keycodes_legend packed'>F11</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F12'  hk='HID_KEY_F12'               class='keycodes_legend packed'>F12</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F13'  hk='HID_KEY_F13'               class='keycodes_legend packed'>F13</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F14'  hk='HID_KEY_F14'               class='keycodes_legend packed'>F14</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F15'  hk='HID_KEY_F15'               class='keycodes_legend packed'>F15</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F16'  hk='HID_KEY_F16'               class='keycodes_legend packed'>F16</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F17'  hk='HID_KEY_F17'               class='keycodes_legend packed'>F17</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F18'  hk='HID_KEY_F18'               class='keycodes_legend packed'>F18</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F19'  hk='HID_KEY_F19'               class='keycodes_legend packed'>F19</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F20'  hk='HID_KEY_F20'               class='keycodes_legend packed'>F20</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F21'  hk='HID_KEY_F21'               class='keycodes_legend packed'>F21</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F22'  hk='HID_KEY_F22'               class='keycodes_legend packed'>F22</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F23'  hk='HID_KEY_F23'               class='keycodes_legend packed'>F23</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F24'  hk='HID_KEY_F24'               class='keycodes_legend packed'>F24</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PSCR' hk='HID_KEY_PRINT_SCREEN'      class='keycodes_legend packed'>PS<br>CR</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_SCRL' hk='HID_KEY_SCROLL_LOCK'       class='keycodes_legend packed'>SC<br>RL</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_BRK'  hk='HID_KEY_PAUSE'             class='keycodes_legend packed'>BRK</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_BRMU' hk='HID_KEY_PAUSE'             class='keycodes_legend packed'>BR<br>MU</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_NUM'  hk='HID_KEY_NUM_LOCK'          class='keycodes_legend packed'>NUM</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PCMM' hk='HID_KEY_KEYPAD_COMMA'      class='keycodes_legend packed'>PAD<br>COM</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PEQS' hk='HID_KEY_KEYPAD_EQUAL_SIGN' class='keycodes_legend packed'>PAD<br>EQL</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PSLS' hk='HID_KEY_KEYPAD_DIVIDE'     class='keycodes_legend packed'>PAD<br>DIV</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PAST' hk='HID_KEY_KEYPAD_MULTIPLY'   class='keycodes_legend packed'>PAD<br>MUL</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PMNS' hk='HID_KEY_KEYPAD_SUBTRACT'   class='keycodes_legend packed'>PAD<br>SUB</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PPLS' hk='HID_KEY_KEYPAD_ADD'        class='keycodes_legend packed'>PAD<br>ADD</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PENT' hk='HID_KEY_KEYPAD_ENTER'      class='keycodes_legend packed'>PAD<br>ENT</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PDOT' hk='HID_KEY_KEYPAD_DECIMAL'    class='keycodes_legend packed'>PAD<br>DOT</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P1'   hk='HID_KEY_KEYPAD_1'          class='keycodes_legend packed'>PAD<br>1</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P2'   hk='HID_KEY_KEYPAD_2'          class='keycodes_legend packed'>PAD<br>2</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P3'   hk='HID_KEY_KEYPAD_3'          class='keycodes_legend packed'>PAD<br>3</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P4'   hk='HID_KEY_KEYPAD_4'          class='keycodes_legend packed'>PAD<br>4</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P5'   hk='HID_KEY_KEYPAD_5'          class='keycodes_legend packed'>PAD<br>5</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P6'   hk='HID_KEY_KEYPAD_6'          class='keycodes_legend packed'>PAD<br>6</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P7'   hk='HID_KEY_KEYPAD_7'          class='keycodes_legend packed'>PAD<br>7</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P8'   hk='HID_KEY_KEYPAD_8'          class='keycodes_legend packed'>PAD<br>8</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P9'   hk='HID_KEY_KEYPAD_9'          class='keycodes_legend packed'>PAD<br>9</div></div></div>
+        <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_P10'  hk='HID_KEY_KEYPAD_10'         class='keycodes_legend packed'>PAD<br>10</div></div></div>
+    </div>
+
+    <div id='keycodes_media' class='keycodes_container media'>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_VOLU' hk='HID_CONSUMER_VOLUME_INCREMENT' class='keycodes_legend'>VOLUME UP</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_VOLD' hk='HID_CONSUMER_VOLUME_DECREMENT' class='keycodes_legend'>VOLUME DOWN</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_BASU' hk='HID_CONSUMER_BASS_INCREMENT'   class='keycodes_legend'>BASS UP</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_BASD' hk='HID_CONSUMER_BASS_DECREMENT'   class='keycodes_legend'>BASS DOWN</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_TREU' hk='HID_CONSUMER_TREBLE_INCREMENT' class='keycodes_legend'>TREBLE UP</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_TRED' hk='HID_CONSUMER_TREBLE_DECREMENT' class='keycodes_legend'>TREBLE DOWN</div></div></div>
+        <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_MAIL' hk='HID_CONSUMER_AL_EMAIL_READER'  class='keycodes_legend'>MAIL</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_CALC' hk='HID_CONSUMER_AL_CALCULATOR'    class='keycodes_legend'>CALCULATOR</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_MYCM' hk='HID_CONSUMER_AL_LOCAL_BROWSER' class='keycodes_legend'>EXPLORER</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WSCH' hk='HID_CONSUMER_AC_SEARCH'        class='keycodes_legend'>SEARCH</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WHOM' hk='HID_CONSUMER_AC_HOME'          class='keycodes_legend'>HOME</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WBAK' hk='HID_CONSUMER_AC_BACK'          class='keycodes_legend'>BACK</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WFWD' hk='HID_CONSUMER_AC_FORWARD'       class='keycodes_legend'>FORWARD</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WSTP' hk='HID_CONSUMER_AC_STOP'          class='keycodes_legend'>STOP</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WREF' hk='HID_CONSUMER_AC_REFRESH'       class='keycodes_legend'>REFRESH</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WFAV' hk='HID_CONSUMER_AC_BOOKMARKS'     class='keycodes_legend'>BOOKMARKS</div></div></div>
+    </div>
+
+    <div id='keycodes_script' class='keycodes_container script'>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0000' hk="" class='keycodes_legend'>SCRIPT #1 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0001' hk="" class='keycodes_legend'>SCRIPT #2 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0002' hk="" class='keycodes_legend'>SCRIPT #3 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0003' hk="" class='keycodes_legend'>SCRIPT #4 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0004' hk="" class='keycodes_legend'>SCRIPT #5 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0005' hk="" class='keycodes_legend'>SCRIPT #6 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0006' hk="" class='keycodes_legend'>SCRIPT #7 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0007' hk="" class='keycodes_legend'>SCRIPT #8 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0008' hk="" class='keycodes_legend'>SCRIPT #9 </div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_0009' hk="" class='keycodes_legend'>SCRIPT #10</div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_000A' hk="" class='keycodes_legend'>SCRIPT #11</div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_000B' hk="" class='keycodes_legend'>SCRIPT #12</div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_000C' hk="" class='keycodes_legend'>SCRIPT #13</div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_000D' hk="" class='keycodes_legend'>SCRIPT #14</div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_000E' hk="" class='keycodes_legend'>SCRIPT #15</div></div></div>
+        <div class='keycodes_item script3'>     <div class='keycodes_inner'><div kc='SC_000F' hk="" class='keycodes_legend'>SCRIPT #16</div></div></div>
+    </div>
+
+    <div id='keycodes_buttons_panel' class='keycodes_buttons_container'>
+        <i id='setkey_param' row='0' col='0' layer='0' keycode=''></i>
+        <input  id='keycodes_buttons_info_before' type='input'  class='keycodes_buttons_info before' value='' readonly/>
+        <input  id='keycodes_buttons_info_after'  type='input'  class='keycodes_buttons_info after' value='' readonly/>
+        <button id='keycodes_buttons_cancel'      type='button' class='keycodes_buttons off'>cancel</button>
+        <button id='keycodes_buttons_set'         type='button' class='keycodes_buttons'>SET</button>
+    </div>
+
+    </div>
+</div>
+
+
+<br><br><br>
 
 </body>
 
 
-<script> // html elements
-let log_serial = $('#log_serial');
-let btn_open   = $('#btn_open');
-let btn_close  = $('#btn_close');
-let btn_send   = $('#btn_send');
-let txt_send   = $('#txt_send');
 
-let btn_get_keymap  = $('#btn_get_keymap');
-let btn_upload_temp = 0;
 
-btn_open.on('click', async() => {
-    if(navigator.serial) {
-        serial_read(port);
-    } else {
-        alert('web serial doesn not work on this browser.');
-    }
+<script> // file (config) upload operations
+/*
+let file_config_json = $("#file-config-json");
+let file_keymap_json = {};
+let file_palette_json = {};
+let file_scripts_json = {};
+let file_meta_switches_json = {};
+
+file_config_json.on("change", (e) => {
+    const files = e.target.files;
+    console.log(files);
+    serial_write('touch ' + files[0].name + '\n\r');
 });
-
-btn_send.on('click', async() => {
-    console.log('sending ', txt_send.val());
-    serial_write(txt_send.val());
-    txt_send.val('');
-});
-
-btn_close.on('click', async() => {
-    //
-});
-
-btn_get_keymap.on('click', async() => {
-    console.log('start downloading keymap');
-});
-
-function append_seriallog(msg) {
-    log_serial.html(log_serial.html() + msg.replace('/> ', '\n'));
-    log_serial.html(log_serial.html().replace(/\n\n/g, '\n'));
-    log_serial.scrollTop(log_serial[0].scrollHeight - log_serial.height());// = log_serial.innerHeight();
-}
+*/
 </script>
 
 
-<script> // serial communication
-let port;
+<script> // user interface
+var log_serial      = $('#log_serial');
+var oled_242        = $('#oled_242');
+var btn_serial      = $('#btn_serial');
+var input_serial    = $('#input_serial');
+var toggle_serial   = $('#toggle_serial');
+var keyboard        = $('#keyboard_face');
+var leds            = $('#leds_face');
+var keycodes_popup  = $('#keycodes_popup');
 
-const filters = [
-    { usbVendorId: 0x5A64, usbProductId: 0x8009 },
-    { usbVendorId: 0x5A64, usbProductId: 0x8008 }
-];
+var selected_keys = []; // [5, 16, ... ] *it says keys, but it'll be a key.
+var selected_leds = []; // unuesd. managed by easySelectables.
 
 
-async function serial_read() {
-    try {
-        port = await navigator.serial.requestPort({filters});
-        await port.open({baudRate: 115200});
-        // TODO: disable open button when opened.
+$(document).ready( function() {
+    console.log('layout:', bitt101.Layout);
+    draw_keyboard(bitt101.Layout);
+});
 
-        while(port.readable) {
-            const reader = port.readable.getReader();
-            try {
-                while(true) {
-                    const {value, done} = await reader.read();
-                    if(done) {
-                        append_seriallog('Cancelled\n');
-                        break;
-                    }
-                    const input_value = new TextDecoder().decode(value);
-                    append_seriallog(input_value);
-                }
-            } catch (e) { 
-                append_seriallog("[ERR:read] " + e + "\n");
-            } finally {
-                reader.releaseLock();
-                // TODO: enable open button when closed.
-            }
-        }
-    } catch (e) {
-        append_seriallog("[ERR:open] " + e + "\n");
+
+var desc_colorpicker = $(".basic").spectrum({
+    color: tinycolor,
+    type: 'text',
+    showPalette: true,
+    showInput: true,
+    showInitial: true,
+    showAlpha: false,
+    containerClassName: 'colorpicker_container',
+    cancelText: 'cancel',
+    chooseText: 'SET',
+    change: onchange_colorpicker,
+    //dragstop: ondragstop_colorpicker,
+});
+
+
+var leds_selectable = leds.easySelectable({
+    item: 'li',
+    state: true,  //onSelecting: function() { console.log('onSelecting: ', $(this)); },
+    onSelected: function(el) {
+        if(!serial.isconfigloaded) return;
+        console.log('selected: ', el.attr('id'));
+        unselect_all_keycaps(); // remove keycap selection when the leds selected.
+        setdesc_leds();
+    },
+    onUnSelected: function(el) {
+        if(!serial.isconfigloaded) return;
+        console.log('onUnSelected: ', el.attr('id'));
+        setdesc_leds();
     }
-}
-
-async function serial_write(msg) {
-    const encoder = new TextEncoder();
-    const writer = port.writable.getWriter();
-    await writer.write(encoder.encode("\n\r" + msg + "\n\r"));
-    writer.releaseLock();
-
-    txt_send.val('');
-}
-
+});
 
 
 
 /*
+var available_keymaps =  $('.beefup').beefup({
+    accessability: true,
+    trigger: '.beefup__head',
+    content: '.beefup__body',
+    animation: 'slide',
+    openSpeed: 200,
+    closeSpeed: 200,
+    openSingle: false,
+}).open();
 
-const port = {};
-var is_keepreading = true;
-var serial_reader;
-const log_serial = $('#log_serial');
-const btn_open   = $('#btn_open');
-const btn_close  = $('#btn_close');
-
-async function serial_start_read_until_closed(p) {
-    while(p.readable && is_keepreading) {
-        reader = port.readable.getReader();
-        //try
-        while(true) {
-            const {value, done} = await reader.read();
-            if(done) break;
-            if(value) log_serial.html( log_serial.html() + value + '\n');
-        }
-        //catch(error)
-        //finally
-    }
-    await p.close();
-}
-
-const promise_serial_closed = serial_start_read_until_closed();
-
-async function serial_connect() {
-    const log = $('#log_serial');
-    const port = await navigator.serial.requestPort({filters});
-    await port.open({baudRate: 115200});
-
-    const decoder = new TextDecoderStream();
-    port.readable.pipeTo(decoder.writable);
-
-    const inputStream = decoder.readable;
-    const reader = inputStream.getReader();
-
-    // do try-catch
-    while(true) {
-        const {value, done} = await reader.read();
-        if(value) {
-            log.html( log.html() + value + '\n');
-        }
-        if(done) {
-            console.log('[READ] done - ', done);
-            reader.releaseLock();
-            break;
-        }
-    }
-}
-
+$('#input_map').on('click', (target) => {
+    let tgt = $(target.currentTarget);
+    console.log('key select', selected_keys, tgt);
+    let skey = $('#k' + selected_keys[0]);
+    let row = skey.attr('row');
+    let col = skey.attr('col');
+    $('#setkey_param').attr('keycode', '');
+    $('#setkey_param').attr('row', row);
+    $('#setkey_param').attr('col', col);
+    $('#keycodes_popup').fadeIn(200);
+});
 */
+
+$('.keycodes_popup_outer').on('click', () => {
+    $('#keycodes_popup').fadeOut(200);
+});
+
+$('.keycodes_item').on('click', (t) => {
+    key = $(t.currentTarget).find('.keycodes_legend');
+    console.log('keycodes click', key.attr('kc'), key.attr('hk'));
+    $('#setkey_param').attr('keycode', key.attr('kc'));
+    if(key.attr('kc').includes('SC_')) {
+        $('#keycodes_buttons_info_after').attr('value', '→ [' + key.attr('kc') + '] ' + serial.json_scripts.scripts[key.attr('kc')].source);
+    } else {
+        $('#keycodes_buttons_info_after').attr('value', '→ [' + key.attr('kc') + '] ' + key.attr('hk'));
+    }
+});
+
+$('#keycodes_buttons_cancel').on('click', () => {
+    $('#keycodes_popup').fadeOut(200);
+});
+
+$('#keycodes_buttons_set').on('click', () => {
+    console.log('no key selected');
+});
+
+toggle_serial.on('click', async() => {
+    try {
+        toggle_serial.css('pointer-events', 'none');
+        const device = await bitt101_disconnect();
+        if(serial.isopen == false) {
+            await bitt101_connect();
+            toggle_serial.children('.toggleserial_toggle').addClass('on');
+            toggle_serial.children('.toggleserial_head').addClass('on');
+            toggle_serial.css('pointer-events', 'auto');
+            serial.isopen = true;
+        } else {
+            const device = await bitt101_disconnect();
+            toggle_serial.children('.toggleserial_toggle').removeClass('on');
+            toggle_serial.children('.toggleserial_head').removeClass('on');
+            toggle_serial.css('pointer-events', 'auto');
+            serial.isopen = false;
+            set_disconnected();
+        }
+    } catch(e) {
+        console.log('connection error:', e.message);
+        toggle_serial.css('pointer-events', 'auto');
+        const device = await bitt101_disconnect();
+        serial.isopen = false;
+        set_disconnected();
+    }
+});
+
+/*
+btn_serial.on('click', async () => {
+    try {
+        btn_serial.attr('disabled', true); // prevent chatter
+        const device = await bitt101_disconnect();
+        if(serial.isopen == false) {
+            await bitt101_connect();
+            btn_serial.val('PRESS TO DISCONNECT');
+            btn_serial.attr('disabled', false);
+            serial.isopen = true;
+        } else {
+            const device = await bitt101_disconnect();
+            btn_serial.val('PRESS TO CONNECT');
+            btn_serial.attr('disabled', false);
+            serial.isopen = false;
+            set_disconnected();
+        }
+    } catch(e) {
+        console.log('connection error:', e.message);
+        btn_serial.attr('disabled', false);
+        const device = await bitt101_disconnect();
+        serial.isopen = false;
+        set_disconnected();
+    }
+});
+*/
+
+async function serial_sendcommand(cmd) {
+    if(device == null) {
+        log_serial.val(log_serial.val() + '* try connect first.\n');
+        log_serial.scrollTop(log_serial[0].scrollHeight - log_serial.height());
+        input_serial.val('');
+        return;
+    }
+    const ret = await device.sendCommand(cmd + '\n\n');
+    input_serial.val('');
+    log_serial.val(log_serial.val() + ret.join('').replace(/\n\n/g, '\n'));
+    log_serial.scrollTop(log_serial[0].scrollHeight - log_serial.height());
+}
+
+input_serial.on('keypress', function(e) {
+    if(e.which == 13) {
+        serial_sendcommand($(this).val());
+    }
+});
+
+function append_oled242(msg) {
+    oled_242.val( oled_242.val() + msg );
+    oled_242.scrollTop(oled_242[0].scrollHeight - oled_242.height());
+}
+
+const akeycap = (m) => {
+    let p = m[0];   // {x:0, y: 0.75, w:1}
+    let n = m[1].split(',');   // '0,0'
+    let r = n[0];
+    let c = n[1];
+    let k = m[2];   // 64
+    let w = p.w * 50;
+    let h = 50;
+    let x = p.x * (50 + 4); // + margin
+    let y = p.y * (50 + 4);
+    return `<div id='k${r}_${c}'
+                row='${r}' col='${c}' no='${k}' keycode=''
+                class='keycap'
+                style='position: absolute;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: ${w}px;
+                    height: ${h}px;'
+            >
+                <div class='keycap_overlay'></div>
+                <div class='keycap_outer'>
+                    <div class='keycap_inner'>
+                    <div class='keycap_legend'>
+                        <div class='keycap_id'>${k}</div>
+                        <div class='keycap_kc' layers=''></div>
+                    </div>
+                    </div>
+                </div>
+            </div>`;
+};
+
+function unselect_all_leds() { // TODO: errorcheck
+    let ls = leds.children('.es-selected');
+    for(k = 0; k < ls.length; k++) {
+        $(ls[k]).removeClass('es-selected');
+    }
+}
+
+function unselect_all_keycaps() {
+    // check selected_keys.length != undefined.
+    for(n = 0; n < selected_keys.length; n++ ) { //console.log('removing class selected for', selected_keys[n]);
+        keyboard.children('div[no='+selected_keys[n]+']').children('.keycap_overlay').removeClass('selected');
+        selected_keys.splice(n, 1);
+    }
+}
+
+function unselect_all() {
+    unselect_all_leds();
+    unselect_all_keycaps();
+    $('#col_map').html('');
+    $('#col_color').css('display', 'none');
+    $('#keydesc_selected').text('');
+}
+
+function setdesc_leds() {
+    let ls = leds.children('.es-selected');
+    let lns = [];
+    for(k = 0; k < ls.length; k++) {
+        lns.push($(ls[k]).attr('id'));
+    }
+    selected_leds = lns;
+    // pad selection
+    if(lns.length > 1) {            // 2 or more pads selected
+        $('#keydesc_colorpicker').spectrum('set', $(ls[0]).attr('overlay'));
+        $('#keydesc').find('#col_color').css('display', 'block');
+        $('#keydesc').find('#col_map').css('display', 'none');
+        $('#keydesc').find('#keydesc_selected').html('PADS ' + lns[0] + '...(' + lns.length + ')');
+    } else if(lns.length == 1) {    // 1 selected
+        let aln = leds.find('span[no=' + lns[0] + ']');
+        let l = aln.attr('layers').trim().split(' ');
+        let r = aln.attr('row');
+        let c = aln.attr('col');
+        $('#keydesc_colorpicker').spectrum('set', $(ls[0]).attr('overlay'));
+        $('#keydesc').find('#col_color').css('display', 'block');
+        $('#keydesc').find('#col_map').css('display', 'flex');
+        $('#keydesc').find('#keydesc_selected').html(`PAD #${lns[0]}\nROW ${r}\nCOL ${c}`);
+        let place = $('#col_map');
+        place.html('');
+        for(let k = 0; k < l.length; k++) {
+            if(k > 1) break; // layer[0, 1]
+            place.append(`
+                <div class='keydesc_keycodes'>
+                    <input type='text' class='keydesc_input' value='${l[k]}' layer='${k}' row='${r}' col='${c}' readonly>
+                    <div class='keydesc_map_layerno'>layer${k}</div>
+                </div>
+            `);
+        }
+        $('.keydesc_input').off('click');
+        $('.keydesc_input').on('click', onclick_keydesc_input);
+    } else {                        // 0 selected
+        $('#keydesc').find('#col_color').css('display', 'none');
+        $('#keydesc').find('#col_map').css('display', 'none');
+        $('#keydesc').find('#keydesc_selected').html('');
+    }
+}
+
+function setdesc_akey() {
+    let keycap = $('div[no="' + selected_keys + '"]'); // TODO: exception when selected_key.length == 0
+    let r = keycap.attr('row');
+    let c = keycap.attr('col');
+    $('#keydesc').find('#col_color').css('display', 'none');
+    $('#keydesc').find('#col_map').css('display', 'flex');
+    $('#keydesc').find('#keydesc_selected').html(`KEY #${selected_keys}\nROW ${r}\nCOL ${c}`);
+
+    let place = $('#col_map');
+    let kcs = keycap.find('.keycap_kc').attr('layers').trim().split(' ');
+    place.html('');
+    for(let k = 0; k < kcs.length; k++) {
+        if(k > 1) break; // layer[0, 1]
+        place.append(`
+            <div class='keydesc_keycodes'>
+                <input type='text' class='keydesc_input' value='${kcs[k]}' layer='${k}' row='${r}' col='${c}' readonly>
+                <div class='keydesc_map_layerno'>layer${k}</div>
+            </div>
+        `);
+    }
+    $('.keydesc_input').off('click');
+    $('.keydesc_input').on('click', onclick_keydesc_input);
+}
+
+function onclick_keydesc_input(target) {
+    let tgt = $(target.currentTarget);
+    console.log('key select', selected_keys, tgt, tgt.attr('row'));
+    let l  = tgt.attr('layer');
+    let r  = tgt.attr('row');
+    let c  = tgt.attr('col');
+    let kc = tgt.attr('value');
+    let hk = $('div[kc=' + kc + ']').attr('hk');
+    $('#setkey_param').attr('keycode', ''); // prepare to ignore [set] if keycode == ''
+    $('#setkey_param').attr('layer', l);    // these are params to perform setkey command
+    $('#setkey_param').attr('row', r);
+    $('#setkey_param').attr('col', c);
+    $('#keycodes_buttons_info_after') .attr('value', '');
+    if(kc.includes('SC_')) {
+        $('#keycodes_buttons_info_before').attr('value', `[${kc}] ${serial.json_scripts.scripts[kc].source}`);
+    } else {
+        $('#keycodes_buttons_info_before').attr('value', `[${kc}] ${hk}`);
+    }
+
+    $('#keycodes_buttons_set').off('click');
+    $('#keycodes_buttons_set').on('click', () => {
+        let kc = $('#setkey_param').attr('keycode');
+        if(kc != '') {
+            let l = $('#setkey_param').attr('layer');
+            let r = $('#setkey_param').attr('row');
+            let c = $('#setkey_param').attr('col');
+            serial_sendcommand(`setkey ${l} ${r} ${c} ${kc}`);
+            console.log(`setkey ${l} ${r} ${c} ${kc}`);
+            serial.iskeymapchanged = true;
+            // set keymap and apply
+            let pkeymap = serial.json_keymap.keymaps.find(el => el.name == serial.current_keymap);
+            pkeymap.layers[l][r][c] = kc;
+            set_current_keymap(serial.current_keymap);
+            unselect_all();
+            $('#keycodes_popup').fadeOut(200);
+        }
+    });
+
+    $('#keycodes_popup').fadeIn(200);
+}
+
+function onchange_colorpicker(target) {
+    serial.isledcolorchanged = true;
+    let l = 0; // assume leds:layer0 for alpha version.
+    //serial_sendcommand('\n\r');
+    for(let k = 0; k < selected_leds.length; k++) {
+        let c = target.toHex8();
+        let n = selected_leds[k] - 1;
+        serial.json_palette.overlays[serial.current_ledpalette][l][n] = target.toHex8(); // '16537eff'
+        console.log('changing led[', n, '] > ', target.toHex8())
+        setTimeout(() => {
+            serial_sendcommand(`setledc 0 ${n} #${c}`);
+        }, k * 50);
+    }
+    set_current_ledcolor(serial.current_ledpalette);
+}
+
+function ondragstop_colorpicker(target) { // TODO
+    //$(element).on('dragstop.spectrum', () => {});
+    //console.log('ondragstop', target, $(target));
+}
+
+function onclick_akeycap(akey) {
+    if(!serial.isconfigloaded) return;
+    let key = $(akey);
+    let no = $(akey).attr('no')
+
+    unselect_all_leds();
+    unselect_all_keycaps();
+    key.children('.keycap_overlay').addClass('selected');
+    selected_keys.push(no);
+    console.log('show info for key', no);
+    setdesc_akey();
+}
+
+function draw_keyboard(lo) {
+    let k;
+    for(k = 0; k < 69; k++) {
+        //console.log(lo.keymap[k])
+        //console.log(akeycap(lo.keymap[k]));
+        keyboard.append(akeycap(lo.keymap[k]));
+    }
+
+}
+
+</script>
+
+
+<script> // serial communication
+var device = null;
+var serial = {
+    isopen: false,
+    isreading: false,
+    isreadwaiting: false,
+    isconfigloaded: false,
+    iskeymapchanged: false,
+    isledcolorchanged: false,
+    setcapture: false,
+    json_keymap: null,
+    json_palette: null,
+    json_config: null,
+    json_scripts: null,
+    current_keymap: '',
+    current_ledbg: '',
+    current_ledpalette: '',
+    lastcommand: '',
+};
+const filters = [
+    { usbVendorId: 0x5A64, usbProductId: 0x8009 }, // bitt101
+    { usbVendorId: 0x5A64, usbProductId: 0x8008 }  // bitt1f
+];
+
+
+function set_disconnected() {
+    // clear jsons
+    // clear led colors
+    // clear keymap display
+    // clear terminal
+    // clear log_buffer
+    location.reload();
+    append_oled242('x disconnected\n\n');
+}
+
+var select_loaded_ledpalette = $('#select_loaded_ledpalette');
+var select_loaded_keymap     = $('#select_loaded_keymap');
+var loaded_container         = $('#loaded_container');
+
+function set_current_ledcolor(palette_name) {
+    let colors = serial.json_palette.overlays[palette_name][0]; // presume layer0 in alpha version.
+    for(let k = 0; k < colors.length; k++) {
+        let tempcolor = tinycolor(colors[k]);
+        tempcolor.setAlpha(0.65);
+        leds.find('li').eq(k).css('background-color', tempcolor.toRgbString());
+        leds.find('li').eq(k).attr('overlay', colors[k]);
+    }
+
+    if(serial.isledcolorchanged) {
+        $('#button_apply_ledcolor').css('opacity', '1');
+        $('#button_apply_ledcolor').css('height', 45);
+        $('#button_apply_ledcolor').on('click', (target) => {
+            $(target.currentTarget).off('click');
+            serial_sendcommand('\n\r');
+            //serial_sendcommand('lcupd');
+            setTimeout(() => {
+                serial_sendcommand('lcupd');
+                serial.isledcolorchanged = false;
+                //set_current_keymap(serial.current_keymap);
+                set_current_ledcolor(serial.current_ledpalette);
+            }, 1000);
+        });
+    } else {
+        $('#button_apply_ledcolor').css('height', 0);
+        $('#button_apply_ledcolor').css('opacity', '0');
+        $('#button_apply_ledcolor').off('click');
+    }
+}
+
+function set_current_keymap(name) {
+    // TODO: exceptions.
+    let keymap = serial.json_keymap.keymaps.find(el => el.name === name);
+    console.log('[keymap]', keymap);
+
+    // clear layers sections.
+    for(let r = 0; r < keymap.layers[0].length; r++) {
+        if(r < 5) {
+            for(let c = 0; c < keymap.layers[0][r].length; c++) $('#k' + r + '_' + c).find('.keycap_kc').attr('layers', '');
+        } else {
+            for(let c = 0; c < keymap.layers[0][r].length; c++) $('#p' + r + '_' + c).attr('layers', '');
+        }
+    }
+
+    for(let l = 0; l < keymap.layers.length; l++) {
+        for(let r = 0; r < keymap.layers[l].length; r++) {
+            if(r < 5) {
+                for(let c = 0; c < keymap.layers[l][r].length; c++) {
+                    let keycap = $('#k' + r + '_' + c);
+                    let kc = keycap.find('.keycap_kc');//.html(keymap.layers[l][r][c].replace('KC_', ''));
+                    kc.attr('layers', kc.attr('layers') + ' ' + keymap.layers[l][r][c]);
+                    if(l == 0) {
+                        kc.html(keymap.layers[l][r][c].replace('KC_', ''));
+                        keycap.on('click', function(key) {
+                            onclick_akeycap(key.currentTarget);
+                        });
+                    }
+                }
+            } else {
+                for(let c = 0; c < keymap.layers[l][r].length; c++) {
+                    let pd = $('#p' + r + '_' + c);
+                    pd.attr('layers', pd.attr('layers') + ' ' + keymap.layers[l][r][c]);
+                    if(l == 0) {
+                        pd.html(keymap.layers[l][r][c].replace('KC_', '').replace('SC_', ''));
+                    }
+                }
+            }
+        }
+    }
+
+    if(serial.iskeymapchanged) {
+        $('#button_apply_keymap').css('opacity', '1');
+        $('#button_apply_keymap').css('height', 45);
+        $('#button_apply_keymap').on('click', (target) => {
+            $(target.currentTarget).off('click');
+            serial_sendcommand('\n\r');
+            //serial_sendcommand('kmupd');
+            setTimeout(() => {
+                serial_sendcommand('kmupd');
+                serial.iskeymapchanged = false;
+                set_current_keymap(serial.current_keymap);
+            }, 1000);
+        });
+    } else {
+        $('#button_apply_keymap').css('height', 0);
+        $('#button_apply_keymap').css('opacity', '0');
+        $('#button_apply_keymap').off('click');
+    }
+
+}
+
+
+function set_loaded_defaults() {
+    if((serial.json_palette == null) || (serial.json_scripts == null)) {
+        console.log('json is not loaded from bitt101.'); // TODO: try serial_read_defaults()
+        return;
+    }
+
+    console.log('set_loaded_defaults');
+    /*
+    select_loaded_ledpalette.empty();
+    let selected_palette_id = 0;
+    let selected_palette_name = '';
+    Object.entries(serial.json_palette.overlays).forEach( (k, v) => {
+        console.log('kv =', k, v);
+        select_loaded_ledpalette.append($('<option></option>').attr('value', k[0]).text(k[0]));
+        if(k[0] == serial.json_config.leds.overlay.palette) {
+            selected_palette_id = v;
+            selected_palette_name = k[0];
+        }
+    });
+    select_loaded_ledpalette.prop('selectedIndex', selected_palette_id);
+    */
+    set_current_ledcolor(serial.current_ledpalette);// json_palette.overlays[selected_palette_name][0]); // 0 to selected layer
+    set_current_keymap(serial.current_keymap);
+
+    $('#keydesc').find('#keydesc_selected').css('height', '64px');
+    loaded_container.css('opacity', 1.0);
+
+    serial.isconfigloaded = true;
+}
+
+
+async function bitt101_disconnect() {
+    try {
+        //device.serial.clearRead();
+        await device.serial.reader.cancel();
+        await device.port.close();//.close();
+    } catch(e) {
+        console.log('error on closing', e);
+    }
+}
+
+async function bitt101_connect() {
+    device = await bitt101.requestConnect();
+    const lines = await device.open();
+    console.log('motd', lines);
+    log_serial.val(lines['motd'].join('').replace(/\n\n/g, '\n'));
+    log_serial.val(log_serial.val() + '\n');
+    log_serial.scrollTop(log_serial[0].scrollHeight - log_serial.height());
+    
+    const fc = await device.getJsonfile('/system/config.json');
+    serial.json_config = JSON.parse(fc[0].replace('[EOF]', ''));
+    append_oled242('[loading] config.json\n');
+    console.log(serial.json_config);
+
+
+
+    const fp = await device.getJsonfile('/system/palette.json');
+    serial.json_palette = JSON.parse(fp[0].replace('[EOF]', ''));
+    append_oled242('[loading] palette.json\n');
+    console.log(serial.json_palette);
+
+    const fk = await device.getJsonfile('/system/keymaps.json');
+    serial.json_keymap = JSON.parse(fk[0].replace('[EOF]', ''));
+    append_oled242('[loading] keymaps.json\n');
+    console.log(serial.json_keymap);
+
+    const sc = await device.getJsonfile('/scripts/scripts.json');
+    serial.json_scripts = JSON.parse(sc[0].replace('[EOF]', ''));
+    append_oled242('[loading] scripts.json\n');
+    console.log(serial.json_scripts);
+
+
+    append_oled242('> bitt101 loaded\n');
+
+    const ckm = await device.sendCommand('current keymap\n\n');
+    serial.current_keymap = ckm.toString().replace('\r', '');
+    append_oled242('  - keymap [' + serial.current_keymap + ']\n');
+
+    const clp = await device.sendCommand('current ledpalette\n\n');
+    serial.current_ledpalette = clp.toString().replace('\r', '');
+    append_oled242('  - ledpalette [' + serial.current_ledpalette + ']');
+
+    set_loaded_defaults();  // presume that the jsons all loaded.
+}
+
 
 
 </script>
 
+
+
+<!--    
+    <div class='keydesc_row row_target'>
+        <div class='keydesc_head'>TARGET</div>
+    </div>
+    <div class='keydesc_row row_map'>
+        <div class='keydesc_label'>MAP</div>
+        <div><input type='text' class='keydesc_input' value='SC_0000' id='input_map' readonly></div>
+    </div>
+    <div class='keydesc_row row_color'>
+        <div class='keydesc_label'>COLOR</div>
+        <div><input type='text' class='keydesc_colorpicker basic' value=''></div>
+    </div>
+-->
+
+<!-- bottom M -->
+<!--
+<div style='min-width: 50px; width: 100%; padding-right: 10px; font-size: 15px; color: #FFF; border: 0px;'>
+    <article class='beefup' id='keymap_list_ordinary'>
+    <h5 class='beefup__head'>normal keys</h5>
+    <div class='beefup__body'><div style='width:30px; height: 30px; color: #222; background-color:#FFF; outline: 1px solid #000;'>M</div></div>
+    </article>
+    <article class='beefup' id='keymap_list_media'>
+    <h5 class='beefup__head'>media keys</h5>
+    <div class='beefup__body'><div style='width:50px; height: 30px; color: #222; background-color: #FE9; outline: 1px solid #000;'>SC0</div></div>
+    </article>
+    <article class='beefup' id='keymap_list_script'>
+    <h2 class='beefup__head'>scripts</h2>
+    <div class='beefup__body'> Hey there</div>
+    </article>
+    <article class='beefup' id='keymap_list_system'>
+    <h2 class='beefup__head'>system functions</h2>
+    <div class='beefup__body'> Hey there</div>
+    </article>
+</div>
+-->
+
+<!-- bottom R
+<div style='min-width: 50px; width: 50px;'>
+    <div style='padding-left: 0; display: flex;'>
+        <div>PRESETS</div>
+    </div>
+</div>
+    -->

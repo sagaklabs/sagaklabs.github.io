@@ -1,0 +1,344 @@
+
+.colorpicker_container {
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    color: #000;
+}
+.colorpicker_container button {
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.button_apply {
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #EEE;
+    margin-right: 25px;
+    position: relative;
+    top: -25px;
+    background-color: #422;
+    width: 150px;
+    height: 45px;
+    border: 2px solid #000;
+    border-top-style: none;
+    line-height: 45px;
+    text-align: center;
+    box-shadow: 0px 6px 2px #0009 inset;
+    cursor: pointer;
+    transition: all 1s ease;
+}
+.button_apply:hover {
+    background-color: rgb(143, 11, 11);
+    text-shadow: 0px 0px 4px #FFF;
+}
+
+.leds_kc {
+    font-size: 11px;
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    color: #000;
+}
+
+.keycap {
+    /*outline: 1px solid #555;
+    background-color: #5555;*/
+}
+.keycap_outer {
+    height: 50px;
+    background-color: #DDD; border-radius: 3px; box-sizing: border-box; padding: 2px 5px 9px;
+    outline: 1px solid #0000001f;
+    box-shadow: rgba(0, 0, 0, 0.2) -1px -1px 0px inset, rgba(255, 255, 255, 0.2) 1px 1px 0px inset;
+    transition: transform 0.2s ease-out 0s;
+}
+.keycap_inner {
+    border-radius: 4px; background: #F5F5F5; height: 100%;
+    box-shadow: rgba(0, 0, 0, 0.1) -1px -1px 0px inset, rgba(255, 255, 255, 0.1) 1px 1px 0px inset;
+}
+.keycap_legend {
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif; color: #888;
+    font-size: 12px; line-height: 11px;
+    padding-top: 5px; padding-left: 5px;
+}
+.keycap_id { font-size: 10px; }
+.keycap_kc { font-size: 12px; font-weight: bold; margin-top: 3px; }
+.keycap_overlay {
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: 3px;
+}
+.selected {
+    background-color: #000;
+    opacity: 0.4;
+    transition: ease 0.5s;
+}
+
+.keydesc_container {
+    font-family: "Roboto Mono Light", monospace; font-size: 16px;
+    width: 100%; height: 60px;
+    display: grid;
+    grid-template-columns: 90px 80%;
+    grid-template-rows: 45px 45px;
+    row-gap: 5px;
+    column-gap: 5px;
+}
+.keydesc_row {
+    display: flex; line-height: 40px; font-family: "Roboto Mono Light", monospace; letter-spacing: -0.03em;
+}
+.keydesc_head {
+    width: 70px; /*font-size: 20px; font-weight: bold; width: 100%; margin-bottom: 10px;*/
+}
+.keydesc_selected {
+    font-family: "Roboto Mono Light", monospace;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: -0.03em;
+    color: #000;
+    padding: 13px 10px;
+    width: 64px;
+    /*height: 64px;*/
+    transition: all 0.5s ease;
+    border: 1px solid #0006;
+    border-radius: 2px;
+    resize: none;
+    text-shadow: 0px 0px 3px #FFF;
+    box-shadow: 3px 5px 1px #0003 inset;
+    background-color: #FFF9;
+    line-height: 22px;
+}
+.keydesc_label {
+    width: 70px; outline: 0px solid; padding: 0px;
+}
+.keydesc_input {
+    box-shadow: none;
+    color: #000;
+    border: 2px solid #000;
+    border-radius: 2px;
+    padding: 10px 15px;
+    font-size: inherit;
+    font-family: inherit;
+    width: 120px;
+    background-color: #EEE;
+}
+.keydesc_colorpicker {
+    width: 120px;
+    box-shadow: none;
+    border: 2px solid #000; /*1px solid #ccc;*/
+    border-radius: 2px;
+    padding: 8px 15px;
+    font-size: inherit;
+    font-family: inherit;
+}
+.keydesc_map_layerno {
+    position: relative;
+    top: -43px;
+    left: 103px;
+    line-height: 17px;
+    text-align: center;
+    color: #555;
+    width: 50px;
+    height: 17px;
+    font-size: 10px;
+    border-radius: 0px 0px 0px 3px;
+    background-color: #0002;
+}
+
+.keycodes_popup_container {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    top: 0px; left: 0px;
+    z-index: 3;
+}
+.keycodes_popup_outer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100vh;
+    z-index: 2;
+    background-color: #000A;
+}
+.keycodes_popup_inner_container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 25px;
+    border-radius: 10px;
+    background-color: #FFF;
+    font-family: "Roboto Mono Light", monospace; letter-spacing: -0.03em;
+    z-index: 3;
+}
+.keycodes_popup.show {
+    display: block;
+    position: relative;
+    transition: background-color 200ms ease;
+}
+
+.keycodes_container.normal {
+    grid-template-columns: repeat(25, 30px);
+    grid-template-rows: repeat(8, 30px);
+}
+.keycodes_container.media  {
+    grid-template-columns: repeat(25, 30px);
+    grid-template-rows: repeat(3, 30px);
+}
+.keycodes_container.script {
+    grid-template-columns: repeat(25, 30px);
+    grid-template-rows: repeat(2, 30px);
+}
+.keycodes_container {
+    display: grid;
+    grid-column-gap: 4px;
+    grid-row-gap: 4px;
+    padding-left: 10px;
+}
+.keycodes_buttons_container {
+    display: flex;
+    height: 70px;
+    margin-top: 20px;
+    justify-content: end;
+}
+.keycodes_buttons_panel {
+    background-color: #0C0;
+}
+.keycodes_buttons_info {
+    position: absolute;
+    font-size: 17px;
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+}
+.keycodes_buttons_info.before {
+    left: 30px; bottom: 55px;
+    border: 0; border-radius: 4px;
+    width: 500px;
+    height: 30px;
+}
+.keycodes_buttons_info.after {
+    left: 30px; bottom: 20px;
+    border: 0; border-radius: 4px;
+    width: 500px;
+    height: 30px;
+}
+.keycodes_buttons {
+    width: 130px;
+    height: 40px;
+    border: 0px;
+    margin: 30px 10px 0px 0px;
+    border-radius: 5px;
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 17px;
+}
+.keycodes_buttons.off {
+    background-color: #0000;
+}
+.keycodes_item {
+    border-radius: 3px;
+    background-color: #5B5B5B;
+    line-height: 10px;
+}
+.keycodes_item.col1_5   {grid-column: span 1.5;} /* decimal not allowed */
+.keycodes_item.col2     {grid-column: span 2; background-color: #000C;}
+.keycodes_item.col3     {grid-column: span 3; background-color: #000C;}
+.keycodes_item.col4     {grid-column: span 4; background-color: #000C;}
+.keycodes_item.col5     {grid-column: span 5; background-color: #000C;}
+.keycodes_item.col6     {grid-column: span 6; background-color: #000C;}
+.keycodes_item.col7     {grid-column: span 7; background-color: #000C;}
+.keycodes_item.col8     {grid-column: span 8; background-color: #000C;}
+.keycodes_item.media1   {grid-column: span 1; background-color: #43574b}
+.keycodes_item.media2   {grid-column: span 2; background-color: #43574b}
+.keycodes_item.media3   {grid-column: span 3; background-color: #43574b}
+.keycodes_item.media4   {grid-column: span 4; background-color: #43574b}
+.keycodes_item.script1  {grid-column: span 1; background-color: #4a5112}
+.keycodes_item.script2  {grid-column: span 2; background-color: #4a5112}
+.keycodes_item.script3  {grid-column: span 3; background-color: #4a5112}
+.keycodes_item.script4  {grid-column: span 4; background-color: #4a5112}
+.keycodes_item.script5  {grid-column: span 5; background-color: #4a5112}
+.keycodes_inner {
+    height: 100%;
+    box-shadow: #0002 3px 2px 0px inset, #0002 -7px -7px 2px inset;
+}
+.keycodes_legend {
+    position: relative;
+    left: 7px;
+    top: 5px;
+    font-size: 11px;
+    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    color: #FFF;
+}
+.keycodes_legend.packed {
+    font-size: 9px;
+    top: 5px; left: 4px;
+    line-height: 8.5px;
+}
+
+.toggleserial_container {
+    width: 100px;
+    height: 75px;
+    margin-top: 3px;
+    outline: 3px solid #000;
+    box-shadow: #FFF1 3px 5px 2px inset, #000 -1px -16px 2px inset;
+    border-radius: 5px;
+    background-color: #222;
+}
+.toggleserial_head {
+    font-size: 11px; color: #888; text-align: center;
+    transition: all 0.5s ease;
+}
+.toggleserial_head.on {
+    padding-top: 2px;
+    color: #8bff73;
+    text-shadow: 0px 0px 2px #ffffff;
+}
+.toggleserial_toggle {
+    margin: 0 auto;
+    width: 60px;
+    height: 24px;
+    border-radius: 13px;
+    background: radial-gradient(circle 10px, white 100%, transparent calc(100% + 1px)) #000 -18px;
+    transition: all 0.5s ease;
+}
+.toggleserial_toggle.on {
+    background: radial-gradient(circle 10px, #007700 100%, transparent calc(100% + 1px)) #000 18px;
+    background-color: #a7ffa7;
+    box-shadow: 0px 0px 7px #0f0;
+}
+
+
+.terminal_screen {
+    margin: 0px 0px 0px 0px;
+    background-color: rgb(0, 0, 0);
+    color: rgb(69, 255, 63);
+    width: 335px;
+    height: 50px;
+    outline: none;
+    border: 0px solid;
+    border-radius: 8px 8px 0px 0px;
+    resize: none;
+    padding: 4px;
+    overflow: auto;
+    font-size: 9px;
+    line-height: 1em;
+    font-family: "Roboto Mono Light", "Courier New", monospace;
+}
+.terminal_input {
+    height: 20px;
+    width: 320px;
+    padding-left: 20px;
+    padding-right: 3px;
+    position: relative;
+    top: -10px;
+    outline: none;
+    border: 0px solid #000;
+    border-radius: 0px 0px 8px 8px;
+    background-color: #000;
+    font-size: 9px;
+    color: rgb(69, 255, 63);
+    font-family: "Roboto Mono Light", "Courier New", monospace;
+    border-top: 1px dashed #030;
+}
+.terminal_prompt {
+    position: relative;
+    top: -36px;
+    left: 4px;
+    font-size: 10px;
+    color: rgb(69, 255, 63);
+    outline: none;
+    font-family: "Roboto Mono Light", "Courier New", monospace;
+}
