@@ -37,10 +37,12 @@
     color: #000;
 }
 
+/*
 .keycap {
-    /*outline: 1px solid #555;
-    background-color: #5555;*/
+    outline: 1px solid #555;
+    background-color: #5555;
 }
+*/
 .keycap_outer {
     height: 50px;
     background-color: #DDD; border-radius: 3px; box-sizing: border-box; padding: 2px 5px 9px;

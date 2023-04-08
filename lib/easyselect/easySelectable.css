@@ -1,4 +1,9 @@
-.easySelectable {-webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;}
+.easySelectable {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
 #leds_face {
     display: grid;
     grid-template-columns: repeat(16, 18px);
