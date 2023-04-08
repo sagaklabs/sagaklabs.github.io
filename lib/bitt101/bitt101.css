@@ -1,14 +1,14 @@
 
 .colorpicker_container {
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
     color: #000;
 }
 .colorpicker_container button {
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .button_apply {
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
     font-size: 14px;
     font-weight: bold;
     color: #EEE;
@@ -33,7 +33,7 @@
 
 .leds_kc {
     font-size: 11px;
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
     color: #000;
 }
 
@@ -55,7 +55,7 @@
     box-shadow: rgba(0, 0, 0, 0.1) -1px -1px 0px inset, rgba(255, 255, 255, 0.1) 1px 1px 0px inset;
 }
 .keycap_legend {
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif; color: #888;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif; color: #888;
     font-size: 12px; line-height: 11px;
     padding-top: 5px; padding-left: 5px;
 }
@@ -73,7 +73,7 @@
 }
 
 .keydesc_container {
-    font-family: "Roboto Mono Light", monospace; font-size: 16px;
+    font-family: "Roboto Mono", monospace; font-size: 16px;
     width: 100%; height: 60px;
     display: grid;
     grid-template-columns: 90px 80%;
@@ -82,13 +82,13 @@
     column-gap: 5px;
 }
 .keydesc_row {
-    display: flex; line-height: 40px; font-family: "Roboto Mono Light", monospace; letter-spacing: -0.03em;
+    display: flex; line-height: 40px; font-family: "Roboto Mono", monospace; letter-spacing: -0.03em;
 }
 .keydesc_head {
     width: 70px; /*font-size: 20px; font-weight: bold; width: 100%; margin-bottom: 10px;*/
 }
 .keydesc_selected {
-    font-family: "Roboto Mono Light", monospace;
+    font-family: "Roboto Mono", monospace;
     font-size: 14px;
     font-weight: bold;
     letter-spacing: -0.03em;
@@ -164,7 +164,7 @@
     padding: 25px;
     border-radius: 10px;
     background-color: #FFF;
-    font-family: "Roboto Mono Light", monospace; letter-spacing: -0.03em;
+    font-family: "Roboto Mono", monospace; letter-spacing: -0.03em;
     z-index: 3;
 }
 .keycodes_popup.show {
@@ -203,7 +203,7 @@
 .keycodes_buttons_info {
     position: absolute;
     font-size: 17px;
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
 }
 .keycodes_buttons_info.before {
     left: 30px; bottom: 55px;
@@ -223,7 +223,7 @@
     border: 0px;
     margin: 30px 10px 0px 0px;
     border-radius: 5px;
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
     font-size: 17px;
 }
@@ -261,7 +261,7 @@
     left: 7px;
     top: 5px;
     font-size: 11px;
-    font-family: "Roboto Mono Light", Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Roboto Mono", Verdana, Geneva, Tahoma, sans-serif;
     color: #FFF;
 }
 .keycodes_legend.packed {
@@ -317,7 +317,7 @@
     overflow: auto;
     font-size: 9px;
     line-height: 1em;
-    font-family: "Roboto Mono Light", "Courier New", monospace;
+    font-family: "Roboto Mono", "Courier New", monospace;
 }
 .terminal_input {
     height: 20px;
@@ -332,7 +332,7 @@
     background-color: #000;
     font-size: 9px;
     color: rgb(69, 255, 63);
-    font-family: "Roboto Mono Light", "Courier New", monospace;
+    font-family: "Roboto Mono", "Courier New", monospace;
     border-top: 1px dashed #030;
 }
 .terminal_prompt {
@@ -342,5 +342,5 @@
     font-size: 10px;
     color: rgb(69, 255, 63);
     outline: none;
-    font-family: "Roboto Mono Light", "Courier New", monospace;
+    font-family: "Roboto Mono", "Courier New", monospace;
 }
