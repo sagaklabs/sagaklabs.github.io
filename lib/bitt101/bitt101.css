@@ -14,7 +14,7 @@
     color: #EEE;
     margin-right: 25px;
     position: relative;
-    top: -25px;
+    top: -10px;
     background-color: #422;
     width: 150px;
     height: 45px;
@@ -359,8 +359,8 @@
     margin: 0;
 }
 .range-slider_range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
+    /*-webkit-appearance: none;
+    appearance: none;*/
     width: 20px;
     height: 20px;
     border-radius: 50%;
