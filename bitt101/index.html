@@ -38,8 +38,8 @@
 
 <div style='width: 100%; padding: 10px; height: 70px; display: flex;'>
     <div style='min-width: 210px;'>
-        <div style='font-family: "Roboto Mono", monospace; font-size: 24px; color: #FFF; line-height: 80px; height:80px; letter-spacing: -0.03em; padding-left: 5px;'>
-            <span>bitt101 editor(alpha/<a href='https://cdn.shopify.com/s/files/1/0623/4990/2000/files/bitt101-1.72.542.uf2?v=1680971820'>firmware</a>)</span>
+        <div style='font-family: "Roboto Mono", monospace; font-size: 20px; color: #FFF; line-height: 80px; height:80px; letter-spacing: -0.03em; padding-left: 5px;'>
+            <span>bitt101 editor(alpha/<a href='https://cdn.shopify.com/s/files/1/0623/4990/2000/files/bitt101-1.92.062.uf2?v=1683787282'>firmware 1.92</a>)</span>
         </div>
         <div style='display: none;'>
         <input type='button' id='btn_serial' value='PRESS TO CONNECT'
@@ -179,19 +179,37 @@
     </div>
 </div>
 
+<div id='led_slider_container' style='border-top-width: 1px; display: none; grid-template-columns: 20% 40%; column-gap: 30px; margin-left: 10px; margin-top: 15px; opacity: 0;'>
+    <div class='range-slider_container'>
+        <span class='range-slider_desc'>LED INTENSITY</span>
+        <div class='range-slider_slider'>
+            <input id='slider_ledint' class='range-slider_range' type='range' value='0' min='0' max='31'>
+            <span id='slider_ledint_value' class='range-slider_value'>0</span>
+        </div>
+    </div>
+    <div class='range-slider_container'>
+        <span class='range-slider_desc'>LED-BG MIX</span>
+        <div class='range-slider_slider'>
+            <input id='slider_ledbgmix' class='range-slider_range' type='range' value='0' min='0' max='255'>
+            <span id='slider_ledbgmix_value' class='range-slider_value'>0</span>
+        </div>
+    </div>
+</div>
+
 
 <div style='border-top-width: 1px; display: flex; margin-left: 10px; margin-top: 25px;'>
     <!-- bottom L -->
     <div id='keydesc' class='keydesc_container'>
         <div id='col_name'  style='margin-left: 0px; grid-row: span 2; display: flex;'>
-            <textarea class='keydesc_selected' id='keydesc_selected' readonly style='height: 0px;'></textarea>
+            <textarea class='keydesc_selected' id='keydesc_selected' readonly style='opacity: 0;'></textarea>
         </div>
         <div id='col_map'   style='margin-left: 10px; column-gap: 10px; display: none;'></div>
         <div id='col_color' style='margin-left: 10px; display: none;'><input type='text' id='keydesc_colorpicker' class='keydesc_colorpicker basic' value=''></div>
     </div>
-    <div id='col_apply' style='margin-left: 10px;'>
+    <div id='col_apply' style='margin-left: 10px; margin-top: -80px;'> <!-- 2023.5.10 temporary -80px for led sliders. -->
         <div id='button_apply_keymap'   class='button_apply' style='opacity: 0;'>SAVE KEYMAP</div>
-        <div id='button_apply_ledcolor' class='button_apply' style='opacity: 0; margin-top: -3px;'>SAVE LEDCOLORS</div>
+        <div id='button_apply_ledcolor' class='button_apply' style='opacity: 0; margin-top: -3px;'>SAVE PADCOLORS</div>
+        <div id='button_apply_config'   class='button_apply' style='opacity: 0; margin-top: -3px;'>SAVE CONFIG</div>
     </div>
 </div>
 
@@ -296,6 +314,7 @@
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F14'  hk='HID_KEY_F14'               class='keycodes_legend packed'>F14</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F15'  hk='HID_KEY_F15'               class='keycodes_legend packed'>F15</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F16'  hk='HID_KEY_F16'               class='keycodes_legend packed'>F16</div></div></div>
+        <!--
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F17'  hk='HID_KEY_F17'               class='keycodes_legend packed'>F17</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F18'  hk='HID_KEY_F18'               class='keycodes_legend packed'>F18</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F19'  hk='HID_KEY_F19'               class='keycodes_legend packed'>F19</div></div></div>
@@ -304,6 +323,7 @@
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F22'  hk='HID_KEY_F22'               class='keycodes_legend packed'>F22</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F23'  hk='HID_KEY_F23'               class='keycodes_legend packed'>F23</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_F24'  hk='HID_KEY_F24'               class='keycodes_legend packed'>F24</div></div></div>
+        -->
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_PSCR' hk='HID_KEY_PRINT_SCREEN'      class='keycodes_legend packed'>PS<br>CR</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_SCRL' hk='HID_KEY_SCROLL_LOCK'       class='keycodes_legend packed'>SC<br>RL</div></div></div>
         <div class='keycodes_item'>     <div class='keycodes_inner'><div kc='KC_BRK'  hk='HID_KEY_PAUSE'             class='keycodes_legend packed'>BRK</div></div></div>
@@ -331,20 +351,22 @@
 
     <div id='keycodes_media' class='keycodes_container media'>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_VOLU' hk='HID_CONSUMER_VOLUME_INCREMENT' class='keycodes_legend'>VOLUME UP</div></div></div>
-        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_VOLD' hk='HID_CONSUMER_VOLUME_DECREMENT' class='keycodes_legend'>VOLUME DOWN</div></div></div>
+        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_VOLD' hk='HID_CONSUMER_VOLUME_DECREMENT' class='keycodes_legend'>VOLUME DN</div></div></div>
+        <!--
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_BASU' hk='HID_CONSUMER_BASS_INCREMENT'   class='keycodes_legend'>BASS UP</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_BASD' hk='HID_CONSUMER_BASS_DECREMENT'   class='keycodes_legend'>BASS DOWN</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_TREU' hk='HID_CONSUMER_TREBLE_INCREMENT' class='keycodes_legend'>TREBLE UP</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_TRED' hk='HID_CONSUMER_TREBLE_DECREMENT' class='keycodes_legend'>TREBLE DOWN</div></div></div>
+        -->
         <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_MAIL' hk='HID_CONSUMER_AL_EMAIL_READER'  class='keycodes_legend'>MAIL</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_CALC' hk='HID_CONSUMER_AL_CALCULATOR'    class='keycodes_legend'>CALCULATOR</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_MYCM' hk='HID_CONSUMER_AL_LOCAL_BROWSER' class='keycodes_legend'>EXPLORER</div></div></div>
-        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WSCH' hk='HID_CONSUMER_AC_SEARCH'        class='keycodes_legend'>SEARCH</div></div></div>
+        <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_WSCH' hk='HID_CONSUMER_AC_SEARCH'        class='keycodes_legend'>SEARCH</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WHOM' hk='HID_CONSUMER_AC_HOME'          class='keycodes_legend'>HOME</div></div></div>
-        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WBAK' hk='HID_CONSUMER_AC_BACK'          class='keycodes_legend'>BACK</div></div></div>
-        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WFWD' hk='HID_CONSUMER_AC_FORWARD'       class='keycodes_legend'>FORWARD</div></div></div>
-        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WSTP' hk='HID_CONSUMER_AC_STOP'          class='keycodes_legend'>STOP</div></div></div>
-        <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WREF' hk='HID_CONSUMER_AC_REFRESH'       class='keycodes_legend'>REFRESH</div></div></div>
+        <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_WBAK' hk='HID_CONSUMER_AC_BACK'          class='keycodes_legend'>BACK</div></div></div>
+        <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_WFWD' hk='HID_CONSUMER_AC_FORWARD'       class='keycodes_legend'>FORWARD</div></div></div>
+        <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_WSTP' hk='HID_CONSUMER_AC_STOP'          class='keycodes_legend'>STOP</div></div></div>
+        <div class='keycodes_item media2'>     <div class='keycodes_inner'><div kc='KC_WREF' hk='HID_CONSUMER_AC_REFRESH'       class='keycodes_legend'>REFRESH</div></div></div>
         <div class='keycodes_item media3'>     <div class='keycodes_inner'><div kc='KC_WFAV' hk='HID_CONSUMER_AC_BOOKMARKS'     class='keycodes_legend'>BOOKMARKS</div></div></div>
     </div>
 
@@ -371,8 +393,10 @@
         <i id='setkey_param' row='0' col='0' layer='0' keycode=''></i>
         <input  id='keycodes_buttons_info_before' type='input'  class='keycodes_buttons_info before' value='' readonly/>
         <input  id='keycodes_buttons_info_after'  type='input'  class='keycodes_buttons_info after' value='' readonly/>
-        <button id='keycodes_buttons_cancel'      type='button' class='keycodes_buttons off'>cancel</button>
-        <button id='keycodes_buttons_set'         type='button' class='keycodes_buttons'>SET</button>
+        <div style='margin: 0; padding: 0; text-align: center;'>
+            <button id='keycodes_buttons_cancel'      type='button' class='keycodes_buttons off'>cancel</button>
+            <button id='keycodes_buttons_set'         type='button' class='keycodes_buttons'>SET</button>
+        </div>
     </div>
 
     </div>
@@ -454,6 +478,11 @@ var leds_selectable = leds.easySelectable({
     }
 });
 
+
+var range_slider = function(target) {
+    
+
+}
 
 
 /*
@@ -798,6 +827,7 @@ var serial = {
     isconfigloaded: false,
     iskeymapchanged: false,
     isledcolorchanged: false,
+    isconfigchanged: false,
     setcapture: false,
     json_keymap: null,
     json_palette: null,
@@ -840,6 +870,7 @@ function set_current_ledcolor(palette_name) {
     if(serial.isledcolorchanged) {
         $('#button_apply_ledcolor').css('opacity', '1');
         $('#button_apply_ledcolor').css('height', 45);
+        $('#button_apply_ledcolor').off('click');
         $('#button_apply_ledcolor').on('click', (target) => {
             $(target.currentTarget).off('click');
             serial_sendcommand('\n\r');
@@ -901,6 +932,7 @@ function set_current_keymap(name) {
     if(serial.iskeymapchanged) {
         $('#button_apply_keymap').css('opacity', '1');
         $('#button_apply_keymap').css('height', 45);
+        $('#button_apply_keymap').off('click');
         $('#button_apply_keymap').on('click', (target) => {
             $(target.currentTarget).off('click');
             serial_sendcommand('\n\r');
@@ -917,6 +949,60 @@ function set_current_keymap(name) {
         $('#button_apply_keymap').off('click');
     }
 
+}
+
+function set_saveconfig_button() {
+    if(serial.isconfigchanged) {
+        if($('#button_apply_config').css('opacity') == '0') {
+            $('#button_apply_config').css('opacity', '1');
+            $('#button_apply_config').css('height', 45);
+            $('#button_apply_config').off('click');
+            $('#button_apply_config').on('click', (target) => {
+                $(target.currentTarget).off('click');
+                serial_sendcommand('\n\r');
+                setTimeout(() => {
+                    serial_sendcommand('cfgupd');
+                    serial.isconfigchanged = false;
+                    set_saveconfig_button();
+                }, 1000);
+            });
+        }
+    } else {
+        $('#button_apply_config').css('height', 0);
+        $('#button_apply_config').css('opacity', '0');
+        $('#button_apply_config').off('click');
+    }
+}
+function set_current_config() {
+    let cfg = serial.json_config;
+    //$('#slider_ledint')  .on('input', function() { $(this).next().html(this.value); })
+    //$('#slider_ledbgmix').on('input', function() { $(this).next().html(this.value); })
+
+    $('#slider_ledint')      .val (cfg.leds.intensity);
+    $('#slider_ledint_value').html(cfg.leds.intensity);
+    $('#slider_ledint').off('change');
+    $('#slider_ledint').on('change', (target) => {
+        let v = $(target.currentTarget).val();
+        $(target.currentTarget).next().html(v);
+        setTimeout(() => {
+            serial_sendcommand('ledint ' + v);
+            serial.isconfigchanged = true;
+            set_saveconfig_button();
+        }, 50);
+    });
+
+    $('#slider_ledbgmix')      .val (cfg.leds.background.mix);
+    $('#slider_ledbgmix_value').html(cfg.leds.background.mix);
+    $('#slider_ledbgmix').off('change');
+    $('#slider_ledbgmix').on('change', (target) => {
+        let v = $(target.currentTarget).val();
+        $(target.currentTarget).next().html(v);
+        setTimeout(() => {
+            serial_sendcommand('ledbgmix ' + v);
+            serial.isconfigchanged = true;
+            set_saveconfig_button();
+        }, 50);
+    });
 }
 
 
@@ -943,8 +1029,12 @@ function set_loaded_defaults() {
     */
     set_current_ledcolor(serial.current_ledpalette);// json_palette.overlays[selected_palette_name][0]); // 0 to selected layer
     set_current_keymap(serial.current_keymap);
+    set_current_config();
 
+    $('#keydesc').find('#keydesc_selected').css('opacity', '1');
     $('#keydesc').find('#keydesc_selected').css('height', '64px');
+    $('#led_slider_container').css('opacity', '1');
+    $('#led_slider_container').css('display', 'grid');
     loaded_container.css('opacity', 1.0);
 
     serial.isconfigloaded = true;
