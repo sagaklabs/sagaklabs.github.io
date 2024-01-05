@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+
+    <script src='../lib/jquery/jquery-3.6.3.js'></script>
+    <script src='../lib/bitt101/bitt101.js'></script>
+    <script src='../lib/jquery-jsoneditor/json-viewer.js'></script>
+    <script src='../lib/jquery-jsoneditor/json-editor.js'></script>
+    <script src='../lib/jquery-smarttab/js/jquery.smartTab.js'></script>
+
+    <link rel='stylesheet' href='../lib/bitt101/bitt101.css'></link>
+    <link rel='stylesheet' href='../lib/jquery-jsoneditor/json-viewer.css'></link>
+    <link rel='stylesheet' href='../lib/jquery-smarttab/css/smart_tab.css'></link>
+
+    <style>
+        body {
+            color: #AAA;
+            background-color: #111;
+            margin: 0 auto;
+            max-width: max-content;
+            font-family: "Roboto Mono", monospace;
+            font-size: 15px;
+            line-height: 25px;
+            overflow-y: scroll;
+        }
+
+        textarea::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<div style='width: 100%; height: 85px; padding: 10px; display: flex;'>
+    <div style='min-width: 210px;'>
+        <div style='width: 400px; font-family: "Roboto Mono", monospace; font-size: 17px; color: #AAA; letter-spacing: -0.03em; padding-left: 5px;'>
+            <span>bitt101 config_file_editor<br> (alpha/<a href='https://cdn.shopify.com/s/files/1/0623/4990/2000/files/bitt101-1.92.062.uf2?v=1683787282'>firmware 1.92</a>)</span>
+        </div>
+    </div>
+    <div style='margin-right: 20px;'>
+        <div id='toggle_serial' class='toggleserial_container'>
+            <div class='toggleserial_head'>bitt101.UART</div>
+            <div class='toggleserial_toggle'></div>
+        </div>
+    </div>
+    <div style='min-width: 200px; padding-right: 0px;'>
+        <textarea class='terminal_screen' id='log_serial'></textarea></br>
+            <input class='terminal_input' id='input_serial'><br>
+            <span class='terminal_prompt'>/> </span></br>
+        </div>
+    </div>
+        <!--<div style='font-size: 14px;'>[MESSAGE] message from UI comes here.</div>-->
+</div>
+
+<div id='smarttab' style='padding-right: 10px; border: 0px;'>
+    <ul class='nav' style='background-color: black; color: white;'>
+        <li><a class='nav-link' href='#tab_config'>config.json</a></li>
+        <li><a class='nav-link' href='#tab_keymaps'>keymaps.json</a></li>
+        <li><a class='nav-link' href='#tab_palette'>palette.json</a></li>
+        <li><a class='nav-link' href='#tab_scripts'>scripts.json</a></li>
+        <li><a class='nav-link' href='#tab_meta_switch'>switches.json</a></li>
+    </ul>
+    <div class='tab-content'>
+        <div id='tab_config' class='tab-pane' tole='tabpanel' style='background-color: black; display: flex;'>
+            <!--<textarea id='content-config' style='width: 500px; height: 600px; background-color: #222; color: #DDD;' autocomplete='off'></textarea>-->
+            <div id='content-config' style='width: 500px; height: 600px ; background-color: #222;'></div>
+            <div id='help-config' style='min-width: 200px; width: 300px; margin-left: 15px;'>
+                /system/config.json<br>
+                parameters<br>
+                keymap: default keymap on boot. use name in keymaps[keymaps][name]<br>
+            </div>
+        </div>
+        <div id='tab_keymaps' class='tab-pane' tole='tabpanel'>
+            <textarea id='content-keymaps' style='width: 500px; height: 800px;  overflow-y: auto;' autocomplete='off'></textarea>
+        </div>
+        <div id='tab_palette' class='tab-pane' tole='tabpanel'>
+            <textarea id='content-palette' style='width: 500px; height: 800px;' autocomplete='off'></textarea>
+        </div>
+        <div id='tab_scripts' class='tab-pane' tole='tabpanel'>
+            <textarea id='content-scripts' style='width: 500px; height: 800px;' autocomplete='off'></textarea>
+        </div>
+        <div id='tab_meta_switch' class='tab-pane' tole='tabpanel'>
+            <textarea id='content-meta-switch' style='width: 500px; height: 800px;' autocomplete='off'></textarea>
+        </div>
+    </div>
+</body>
+
+
+
+<script>
+var editor_json;
+var json_config = '{"version":"config-1.72.542","keymap":"windows","gameid":"0","splash":{"pattern":"0","hue":"50","saturation":"50","hint":"3F4F707F"},"leds":{"intensity":"2","overlay":{"palette":"updown","intensity":"99","hue":"50","saturation":"50","hint":"FF4F7FFF"},"background":{"pattern":"0","mix":"6","intensity":"99","hue":"50","saturation":"50","hint":"FFFFFFFF"}}}'
+
+$(function() {
+
+    $('#smarttab').smartTab({
+        theme: 'basic',
+        selected: 0,
+    });
+
+    editor_json = new  JsonEditor('#content-config', {});
+    editor_json.load(JSON.parse(json_config));    
+});
+</script>
